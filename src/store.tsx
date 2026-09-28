@@ -32,6 +32,8 @@ type AppState = {
   setIsCalling: (val: boolean) => void;
   callData: { user: User; type: 'voice' | 'video' } | null;
   setCallData: (data: { user: User; type: 'voice' | 'video' } | null) => void;
+  selectedCameraId: string;
+  setSelectedCameraId: (id: string) => void;
 };
 
 const StoreContext = createContext<AppState | null>(null);
@@ -49,6 +51,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeStory, setActiveStory] = useState<{ userId: string; user: User } | null>(null);
   const [isCalling, setIsCalling] = useState(false);
   const [callData, setCallData] = useState<{ user: User; type: 'voice' | 'video' } | null>(null);
+  const [selectedCameraId, setSelectedCameraIdState] = useState<string>(() => {
+    return localStorage.getItem('preferredCameraId') || '';
+  });
+  const setSelectedCameraId = (id: string) => {
+    setSelectedCameraIdState(id);
+    localStorage.setItem('preferredCameraId', id);
+  };
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
   });
@@ -136,7 +145,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       isCalling,
       setIsCalling,
       callData,
-      setCallData
+      setCallData,
+      selectedCameraId,
+      setSelectedCameraId
     }}>
       {children}
     </StoreContext.Provider>

@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { User, VerificationRequest } from '../types';
 import { submitVerificationRequest } from '../lib/db';
 import { compressImage } from '../lib/imageUtils';
+import { useAppStore } from '../store';
+import { CameraDeviceSelector } from './CameraDeviceSelector';
 
 interface VerificationModalProps {
   user: User;
@@ -11,6 +13,7 @@ interface VerificationModalProps {
 }
 
 export function VerificationModal({ user, onClose }: VerificationModalProps) {
+  const { selectedCameraId } = useAppStore();
   const [step, setStep] = useState(1);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -28,7 +31,8 @@ export function VerificationModal({ user, onClose }: VerificationModalProps) {
 
   useEffect(() => {
     if (showCamera) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      const videoConstraints = selectedCameraId ? { deviceId: { exact: selectedCameraId } } : true;
+      navigator.mediaDevices.getUserMedia({ video: videoConstraints })
         .then(s => {
           setStream(s);
         })
@@ -41,7 +45,7 @@ export function VerificationModal({ user, onClose }: VerificationModalProps) {
       stream.getTracks().forEach(t => t.stop());
       setStream(null);
     }
-  }, [showCamera]);
+  }, [showCamera, selectedCameraId]);
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -344,8 +348,11 @@ export function VerificationModal({ user, onClose }: VerificationModalProps) {
               exit={{ opacity: 0 }}
               className="absolute inset-0 z-[1100] bg-black flex flex-col"
             >
-              <div className="flex items-center justify-between p-6">
+              <div className="flex items-center justify-between p-6 bg-black/80">
                 <h4 className="text-white font-black uppercase tracking-widest text-sm">Live Camera</h4>
+                <div className="w-64">
+                  <CameraDeviceSelector className="text-white bg-zinc-900/90 p-2 rounded-xl border border-zinc-800 text-xs" />
+                </div>
                 <button onClick={() => setShowCamera(null)} className="text-white p-2 hover:bg-white/10 rounded-full"><X size={24} /></button>
               </div>
               <div className="flex-1 relative overflow-hidden flex items-center justify-center">

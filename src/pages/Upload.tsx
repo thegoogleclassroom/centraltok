@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { saveVideos, getVideos, getStories, saveStories } from '../lib/db';
 import { Video, Story } from '../types';
+import { CameraDeviceSelector } from '../components/CameraDeviceSelector';
 import { 
   Upload as UploadIcon, X, Video as VideoIcon, Camera, Image as ImageIcon, 
   Users, Lock, Globe, Zap, CircleDot, Disc, Music, Type, Plus, Minus, Move
@@ -33,7 +34,7 @@ const ANIMATIONS = [
 ];
 
 export function Upload() {
-  const { currentUser } = useAppStore();
+  const { currentUser, selectedCameraId } = useAppStore();
   const navigate = useNavigate();
   const [postTarget, setPostTarget] = useState<'feed' | 'story'>('feed');
   const [mode, setMode] = useState<'video' | 'image' | 'record' | 'screen'>('video');
@@ -93,7 +94,8 @@ export function Upload() {
   // Handle switching to camera or screen
   useEffect(() => {
     if (mode === 'record' && !stream) {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      const videoConstraints = selectedCameraId ? { deviceId: { exact: selectedCameraId } } : true;
+      navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true })
         .then(s => {
           setStream(s);
         })
@@ -642,6 +644,7 @@ export function Upload() {
           
           {/* Form Area */}
           <div className="flex-1 flex flex-col gap-5">
+            <CameraDeviceSelector className="bg-zinc-50 dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800" />
             <div>
               <label className="block font-semibold mb-2">Caption / Description</label>
               <textarea 
