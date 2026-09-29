@@ -62,6 +62,7 @@ export const GAMES: GameItem[] = [
 ];
 
 export const APPS: GameItem[] = [
+  { id: 'central-music', title: 'Central Music', url: 'Apps/CentralMusic.html', category: 'Music System', color: 'cyan', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/spotify.svg' },
   { id: 'cinema', title: 'CinemaTok', url: 'Apps/Cinema.html', category: 'Global Stream', color: 'pink' },
   { id: 'snapchat', title: 'Snapchat', url: 'https://nhjkdbiondnnd.dila.cl/embed.html#https://snapchat.com/spotlight', category: 'Spotlight View', color: 'yellow' },
 ];

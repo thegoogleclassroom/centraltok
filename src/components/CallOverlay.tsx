@@ -9,6 +9,7 @@ import {
 import { useAppStore } from '../store';
 import { createCall, updateCall, addIceCandidate, subscribeToCall, deleteCall, getUsers, db } from '../lib/db';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { CameraDeviceSelector } from './CameraDeviceSelector';
 
 const servers: RTCConfiguration = {
   iceServers: [
@@ -80,7 +81,7 @@ function setupAudioAnalyzer(stream: MediaStream, onSpeakingChange: (speaking: bo
 }
 
 export function CallOverlay() {
-  const { isCalling, setIsCalling, callData, currentUser, setCallData } = useAppStore();
+  const { isCalling, setIsCalling, callData, currentUser, setCallData, selectedCameraId } = useAppStore();
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
   const [isCameraOn, setIsCameraOn] = useState(false);
@@ -88,6 +89,7 @@ export function CallOverlay() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [remoteIsSpeaking, setRemoteIsSpeaking] = useState(false);
   const [callStatus, setCallStatus] = useState<'idle' | 'calling' | 'ringing' | 'active'>('idle');
+  const [showCameraSettings, setShowCameraSettings] = useState(false);
   
   const pc = useRef<RTCPeerConnection | null>(null);
   const localStream = useRef<MediaStream | null>(null);
@@ -202,7 +204,8 @@ export function CallOverlay() {
       remoteStream.current = new MediaStream();
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isCameraOn });
+        const videoConstraints = selectedCameraId ? { deviceId: { exact: selectedCameraId } } : true;
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isCameraOn ? videoConstraints : false });
         localStream.current = stream;
         stream.getTracks().forEach((track) => {
           newPc.addTrack(track, stream);
@@ -356,7 +359,8 @@ export function CallOverlay() {
     remoteStream.current = new MediaStream();
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isCameraOn });
+      const videoConstraints = selectedCameraId ? { deviceId: { exact: selectedCameraId } } : true;
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isCameraOn ? videoConstraints : false });
       localStream.current = stream;
       stream.getTracks().forEach((track) => {
         newPc.addTrack(track, stream);
@@ -532,7 +536,8 @@ export function CallOverlay() {
   const toggleCamera = async () => {
     if (!isCameraOn) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const videoConstraints = selectedCameraId ? { deviceId: { exact: selectedCameraId } } : true;
+        const stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints });
         const videoTrack = stream.getVideoTracks()[0];
         if (localStream.current) {
           localStream.current.addTrack(videoTrack);

@@ -14,10 +14,11 @@ import {
   ShieldCheck, UserPlus, UserMinus, Shield
 } from 'lucide-react';
 import { HolographicBadge } from '../components/UIPolish';
+import { CameraDeviceSelector } from '../components/CameraDeviceSelector';
 
 export function Chat() {
   const { handle, groupId } = useParams<{ handle?: string, groupId?: string }>();
-  const { currentUser, setIsCalling, setCallData } = useAppStore();
+  const { currentUser, setIsCalling, setCallData, selectedCameraId } = useAppStore();
   const navigate = useNavigate();
   
   const [otherUser, setOtherUser] = useState<User | null>(null);
@@ -306,8 +307,9 @@ export function Chat() {
   };
 
   useEffect(() => {
-    if (showCamera && videoRef.current && (videoRef.current.srcObject as MediaStream)?.id !== (videoRef.current.srcObject as any)?._streamId) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+    if (showCamera && videoRef.current) {
+      const videoConstraints = selectedCameraId ? { deviceId: { exact: selectedCameraId } } : true;
+      navigator.mediaDevices.getUserMedia({ video: videoConstraints })
         .then(stream => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
@@ -329,7 +331,7 @@ export function Chat() {
         (videoRef.current as any)._streamId = null;
       }
     };
-  }, [showCamera]);
+  }, [showCamera, selectedCameraId]);
 
   const stopCamera = () => {
     if (videoRef.current?.srcObject) {
@@ -740,6 +742,9 @@ export function Chat() {
               <button onClick={() => setCameraFilter('grayscale')} className={`px-3 py-1 rounded-full text-xs font-bold ${cameraFilter === 'grayscale' ? 'bg-pink-600 text-white' : 'bg-white/20 text-white'}`}>B&W</button>
               <button onClick={() => setCameraFilter('saturate-200')} className={`px-3 py-1 rounded-full text-xs font-bold ${cameraFilter === 'saturate-200' ? 'bg-pink-600 text-white' : 'bg-white/20 text-white'}`}>Vivid</button>
             </div>
+          </div>
+          <div className="absolute top-20 left-4 right-4 z-10 max-w-sm mx-auto">
+            <CameraDeviceSelector className="bg-black/60 backdrop-blur-md text-white p-3 rounded-2xl border border-white/20 text-xs" />
           </div>
           <div className="flex-1 relative overflow-hidden flex items-center justify-center">
             <video ref={videoRef} autoPlay playsInline className={`w-full h-full object-cover ${cameraFilter}`} />

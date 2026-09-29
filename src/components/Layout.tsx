@@ -15,6 +15,7 @@ import { IncomingCallModal } from './IncomingCallModal';
 
 import { VerificationModal } from './VerificationModal';
 import { ForumChooserModal } from './ForumChooserModal';
+import { GlobalMusicBubble } from './GlobalMusicBubble';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { 
@@ -624,6 +625,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       )}
+      <GlobalMusicBubble />
     </div>
   );
 }

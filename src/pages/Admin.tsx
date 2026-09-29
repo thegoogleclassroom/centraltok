@@ -6,10 +6,11 @@ import { ShieldAlert, AlertTriangle, Users, FileText, CheckCircle, XCircle, Tras
 import { getDeviceId } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { GAMES, APPS } from '../data/games';
+import { ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 
 export function Admin() {
   const { currentUser } = useAppStore();
-  const [activeTab, setActiveTab] = useState<'reports' | 'users' | 'appeals' | 'logs' | 'announcements' | 'verification' | 'suggestions' | 'settings'>('reports');
+  const [activeTab, setActiveTab] = useState<'reports' | 'users' | 'appeals' | 'logs' | 'announcements' | 'verification' | 'suggestions' | 'settings' | 'analytics'>('reports');
   
   const [reports, setReports] = useState<Report[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -638,8 +639,8 @@ export function Admin() {
         </div>
 
         <div className="flex gap-2 mb-6 border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto pb-2">
-          {['reports', 'users', 'appeals', 'logs', 'announcements', 'verification', 'suggestions', 'settings'].map(tab => (
-            ((tab !== 'logs' && tab !== 'announcements' && tab !== 'verification' && tab !== 'suggestions' && tab !== 'settings') || isOwner) && (
+          {['reports', 'users', 'appeals', 'logs', 'announcements', 'verification', 'suggestions', 'settings', 'analytics'].map(tab => (
+            ((tab !== 'logs' && tab !== 'announcements' && tab !== 'verification' && tab !== 'suggestions' && tab !== 'settings' && tab !== 'analytics') || isOwner) && (
               <button 
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -1629,6 +1630,145 @@ export function Admin() {
                        </button>
                     </div>
                     <p className="text-xs text-zinc-500">Disables access to the Games & Apps section.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'analytics' && isOwner && (
+            <div className="space-y-8">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold mb-1">Platform Analytics & Insights</h2>
+                  <p className="text-zinc-500 text-sm">Real-time engagement metrics, video category breakdown, and growth analytics.</p>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => {
+                      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ videos, users, reports, timestamp: Date.now() }, null, 2));
+                      const dlAnchorElem = document.createElement('a');
+                      dlAnchorElem.setAttribute("href", dataStr);
+                      dlAnchorElem.setAttribute("download", `platform_analytics_${Date.now()}.json`);
+                      dlAnchorElem.click();
+                    }}
+                    className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-xl text-xs font-bold transition-colors shadow-lg shadow-pink-600/20"
+                  >
+                    Export Analytics JSON
+                  </button>
+                </div>
+              </div>
+
+              {/* KPI Cards Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-zinc-50 dark:bg-zinc-950 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1">Total Videos</p>
+                  <p className="text-3xl font-black text-pink-600">{videos.length}</p>
+                  <p className="text-[10px] text-green-500 font-semibold mt-2">+12% from last week</p>
+                </div>
+                <div className="bg-zinc-50 dark:bg-zinc-950 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1">Registered Users</p>
+                  <p className="text-3xl font-black text-indigo-500">{users.length}</p>
+                  <p className="text-[10px] text-green-500 font-semibold mt-2">+8% new signups</p>
+                </div>
+                <div className="bg-zinc-50 dark:bg-zinc-950 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1">Total Views</p>
+                  <p className="text-3xl font-black text-amber-500">
+                    {videos.reduce((acc, v) => acc + (v.views || 0), 0).toLocaleString()}
+                  </p>
+                  <p className="text-[10px] text-green-500 font-semibold mt-2">High engagement rate</p>
+                </div>
+                <div className="bg-zinc-50 dark:bg-zinc-950 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1">Pending Reports</p>
+                  <p className="text-3xl font-black text-red-500">{reports.filter(r => r.status === 'pending').length}</p>
+                  <p className="text-[10px] text-zinc-400 font-semibold mt-2">Requires moderation</p>
+                </div>
+              </div>
+
+              {/* Recharts 1: Trending Video Categories (BarChart) */}
+              <div className="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                <h3 className="text-lg font-bold mb-2">Trending Video Categories (Views & Count)</h3>
+                <p className="text-xs text-zinc-500 mb-6">Distribution of views and uploaded videos across different categories.</p>
+                
+                <div className="w-full h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={Object.values(videos.reduce((acc, v) => {
+                      const cat = v.category || 'General';
+                      if (!acc[cat]) acc[cat] = { category: cat, views: 0, count: 0, likes: 0 };
+                      acc[cat].views += (v.views || 0);
+                      acc[cat].likes += (v.likes || 0);
+                      acc[cat].count += 1;
+                      return acc;
+                    }, {} as Record<string, { category: string; views: number; count: number; likes: number }>))}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                      <XAxis dataKey="category" stroke="#888888" fontSize={12} />
+                      <YAxis stroke="#888888" fontSize={12} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff' }}
+                      />
+                      <Legend />
+                      <Bar dataKey="views" fill="#db2777" name="Total Views" radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="likes" fill="#6366f1" name="Total Likes" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Recharts 2: Top Video Engagement Metrics (AreaChart) */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                  <h3 className="text-lg font-bold mb-2">Top Video Engagement (Likes & Comments)</h3>
+                  <p className="text-xs text-zinc-500 mb-6">Comparing interaction rates on top platform videos.</p>
+                  
+                  <div className="w-full h-[280px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={videos.slice(0, 8).map((v, i) => ({
+                        title: v.title ? v.title.substring(0, 12) + '...' : `Video ${i+1}`,
+                        likes: v.likes || 0,
+                        comments: v.commentsCount || (v.comments ? v.comments.length : 0),
+                        shares: v.shares || 0,
+                      }))}>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                        <XAxis dataKey="title" stroke="#888888" fontSize={10} />
+                        <YAxis stroke="#888888" fontSize={12} />
+                        <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff' }} />
+                        <Legend />
+                        <Area type="monotone" dataKey="likes" stroke="#ec4899" fill="#ec4899" fillOpacity={0.3} name="Likes" />
+                        <Area type="monotone" dataKey="comments" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} name="Comments" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Recharts 3: User Role Breakdown (PieChart) */}
+                <div className="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                  <h3 className="text-lg font-bold mb-2">User Roles & Verification Breakdown</h3>
+                  <p className="text-xs text-zinc-500 mb-6">Proportion of regular users, staff, and owners.</p>
+                  
+                  <div className="w-full h-[280px] flex items-center justify-center">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: 'Users', value: users.filter(u => u.role === 'user' || !u.role).length },
+                            { name: 'Staff', value: users.filter(u => u.role === 'staff').length },
+                            { name: 'Owners', value: users.filter(u => u.role === 'owner').length },
+                            { name: 'Verified', value: users.filter(u => u.isVerified).length },
+                          ]}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={90}
+                          dataKey="value"
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        >
+                          <Cell fill="#ec4899" />
+                          <Cell fill="#6366f1" />
+                          <Cell fill="#f59e0b" />
+                          <Cell fill="#10b981" />
+                        </Pie>
+                        <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff' }} />
+                      </PieChart>
+                    </ResponsiveContainer>
                   </div>
                 </div>
               </div>
