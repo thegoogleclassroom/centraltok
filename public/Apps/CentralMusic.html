@@ -203,30 +203,82 @@
         }
 
         async function execSearch(query) {
+            const container = document.getElementById('search-results');
+            container.innerHTML = '<div style="color:var(--accent); grid-column: 1/-1; text-align:center; padding:20px;">Searching audio signals...</div>';
+            
+            let results = [];
+
+            // Try Worker first
             try {
                 const res = await fetch(`${WORKER_URL}/s/${cleanQuery(query)}`);
                 const data = await res.json();
-                const results = data.results || data; 
-                const container = document.getElementById('search-results');
-                container.innerHTML = '';
-                results.forEach(t => {
-                    const card = document.createElement('div');
-                    card.style.cssText = "background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid transparent;";
-                    card.onmouseover = () => card.style.borderColor = "var(--accent)";
-                    card.onmouseout = () => card.style.borderColor = "transparent";
-                    card.onclick = () => { addToQueue(t); hideOverlays(); };
-                    card.innerHTML = `<img src="${t.artwork}" style="width:100%; aspect-ratio:1; border-radius:10px; object-fit:cover; margin-bottom:10px;">
-                                      <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.9rem;">${t.title}</div>
-                                      <div style="color:var(--text-dim); font-size:0.7rem;">${t.artist}</div>`;
-                    container.appendChild(card);
-                });
-            } catch(e) { console.error("Search failed"); }
+                results = data.results || data;
+            } catch(e) {
+                console.warn("Worker search failed, trying fallback...");
+            }
+
+            // If worker failed or returned empty, use iTunes API fallback
+            if (!results || results.length === 0) {
+                try {
+                    const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=24`);
+                    const itunesData = await itunesRes.json();
+                    if (itunesData.results) {
+                        results = itunesData.results.map(item => ({
+                            title: item.trackName,
+                            artist: item.artistName,
+                            artwork: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '600x600bb') : '',
+                            url: item.previewUrl,
+                            streamUrl: item.previewUrl
+                        }));
+                    }
+                } catch (err) {
+                    console.error("Fallback search failed", err);
+                }
+            }
+
+            container.innerHTML = '';
+            if (!results || results.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-dim); grid-column: 1/-1; text-align:center; padding:20px;">No audio signals found. Try another search.</div>';
+                return;
+            }
+
+            results.forEach(t => {
+                const card = document.createElement('div');
+                card.style.cssText = "background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; transition:0.2s;";
+                card.onmouseover = () => card.style.borderColor = "var(--accent)";
+                card.onmouseout = () => card.style.borderColor = "transparent";
+                card.onclick = () => { addToQueue(t); hideOverlays(); };
+                card.innerHTML = `<img src="${t.artwork || ''}" style="width:100%; aspect-ratio:1; border-radius:10px; object-fit:cover; margin-bottom:10px; background:#0a192f;">
+                                  <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.9rem;">${t.title}</div>
+                                  <div style="color:var(--text-dim); font-size:0.7rem;">${t.artist}</div>`;
+                container.appendChild(card);
+            });
         }
 
         async function playTrack(index) {
             if (index < 0 || index >= queue.length) return;
             currentIndex = index;
             let track = queue[index];
+
+            if (track.streamUrl) {
+                currentTrackData = {
+                    song: track.title,
+                    title: track.title,
+                    artist: track.artist,
+                    artwork: track.artwork,
+                    streamUrl: track.streamUrl
+                };
+                audio.src = track.streamUrl;
+                document.getElementById('art-zone').innerHTML = `<img src="${track.artwork || ''}">`;
+                bgBlur.style.backgroundImage = `url(${track.artwork || ''})`;
+                document.getElementById('track-title').innerText = track.title;
+                document.getElementById('track-artist').innerText = track.artist;
+                audio.play();
+                document.getElementById('play-btn').innerText = '⏸';
+                updateQueueUI();
+                if (isLyricMode) fetchLyrics(track.artist, track.title);
+                return;
+            }
 
             try {
                 const slug = track.url.replace(/https?:\/\/soundcloud\.com\//, '');
@@ -244,7 +296,21 @@
                 updateQueueUI();
                 
                 if (isLyricMode) fetchLyrics(data.artist, data.song || data.title);
-            } catch (e) { alert("Playback Error"); }
+            } catch (e) {
+                if (track.url && (track.url.startsWith('http://') || track.url.startsWith('https://'))) {
+                    currentTrackData = track;
+                    audio.src = track.url;
+                    document.getElementById('art-zone').innerHTML = `<img src="${track.artwork || ''}">`;
+                    bgBlur.style.backgroundImage = `url(${track.artwork || ''})`;
+                    document.getElementById('track-title').innerText = track.title;
+                    document.getElementById('track-artist').innerText = track.artist;
+                    audio.play();
+                    document.getElementById('play-btn').innerText = '⏸';
+                    updateQueueUI();
+                } else {
+                    alert("Playback Error: Unable to stream track.");
+                }
+            }
         }
 
         function toggleLyrics() {
