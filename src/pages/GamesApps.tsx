@@ -68,12 +68,19 @@ export function GamesApps() {
     setIsGameActive(true);
     setMiniPlayerActive(false);
     
+    if (url.includes('CentralMusic.html')) {
+      localStorage.setItem('aura_in_music_app', 'true');
+    } else {
+      localStorage.setItem('aura_in_music_app', 'false');
+    }
+    
     if (currentUser) {
       await updateUserGame(currentUser.id, title);
     }
   };
 
   const handleExit = async () => {
+    localStorage.setItem('aura_in_music_app', 'false');
     if (activeGameUrl.includes('Cinema.html') && miniPlayerUrl) {
       setMiniPlayerActive(true);
     }

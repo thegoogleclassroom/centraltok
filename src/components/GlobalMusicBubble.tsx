@@ -44,7 +44,8 @@ export function GlobalMusicBubble() {
     };
   }, []);
 
-  if (!track || !isVisible) return null;
+  const inMusicApp = localStorage.getItem('aura_in_music_app') === 'true';
+  if (!track || !isVisible || inMusicApp) return null;
 
   const sendCommand = (action: string, extra = {}) => {
     localStorage.setItem('aura_player_command', JSON.stringify({ action, timestamp: Date.now(), ...extra }));
