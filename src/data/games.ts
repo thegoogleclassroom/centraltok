@@ -59,6 +59,16 @@ export const GAMES: GameItem[] = [
   { id: 'solar-smash', title: 'Solar Smash', url: 'Games/SolarSmash.html', category: 'Planet Destroyer', color: 'pink', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/solar_smash.svg' },
   { id: 'terraria', title: 'Terraria', url: 'Games/Terraria.html', category: 'Sandbox', color: 'green', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/terraria.svg' },
   { id: 'tabs', title: 'TABS', url: 'Games/Totally Accurate Battle Simulator (TABS).html', category: 'Strategy', color: 'red', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/tabs.svg' },
+  { id: 'amaze', title: 'Amaze!', url: 'Games/Amaze.html', category: 'Puzzle', color: 'cyan', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/maze.svg' },
+  { id: 'angry-birds', title: 'Angry Birds', url: 'Games/Angry Birds.html', category: 'Action', color: 'red', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/angry_birds.svg' },
+  { id: 'aquapark-io', title: 'Aquapark.io', url: 'Games/Aquapark.io.html', category: 'Multiplayer', color: 'blue', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/water_park.svg' },
+  { id: 'basket-battle', title: 'Basket Battle', url: 'Games/Basket Battle.html', category: 'Multiplayer', color: 'orange', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/basketball.svg' },
+  { id: 'brawl-simulator-3d', title: 'Brawl Simulator 3D', url: 'Games/Brawl Simulator 3D.html', category: 'Fighting', color: 'amber', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/brawl_stars.svg' },
+  { id: 'build-a-big-army', title: 'Build a Big Army', url: 'Games/Build a Big Army.html', category: 'Building', color: 'indigo', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/army.svg' },
+  { id: 'fnf-carol-v2', title: 'Friday Night Funkin vs Carol V2', url: 'Games/Friday Night Funkin vs Carol V2.html', category: 'Rhythm', color: 'pink', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/fnf.svg' },
+  { id: 'fnf-shaggy', title: 'Friday Night Funkin vs Shaggy', url: 'Games/Friday Night Funkin vs Shaggy.html', category: 'Rhythm', color: 'green', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/fnf.svg' },
+  { id: 'fnf-sunday', title: 'Friday Night Funkin vs Sunday Remastered HD', url: 'Games/Friday Night Funkin vs Sunday Remastered HD.html', category: 'Rhythm', color: 'purple', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/fnf.svg' },
+  { id: 'idle-lumber-inc', title: 'Idle Lumber Inc', url: 'Games/Idle Lumber Inc.html', category: 'Building', color: 'emerald', icon: 'https://cdn.jsdelivr.net/gh/Arcticons-Team/Arcticons/icons/black/lumber.svg' },
 ];
 
 export const APPS: GameItem[] = [

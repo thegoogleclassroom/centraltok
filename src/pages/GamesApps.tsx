@@ -25,6 +25,7 @@ export function GamesApps() {
   const [isCrashed, setIsCrashed] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'games' | 'apps'>('games');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [showSuggestModal, setShowSuggestModal] = useState(false);
   const [suggestionData, setSuggestionData] = useState({ name: '', type: 'game' as 'game' | 'app', description: '' });
@@ -209,8 +210,34 @@ export function GamesApps() {
           </div>
         </div>
 
+        {/* Category Bubbles Bar */}
+        {activeTab === 'games' && (
+          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-none">
+            {['All', 'Multiplayer', 'Building', 'Fighting', 'Action', 'Puzzle', 'Rhythm', 'Strategy', 'Sports', 'Idle', 'Racing', 'Horror', 'Sandbox'].map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all shadow-sm ${
+                  selectedCategory === cat
+                    ? 'bg-pink-600 text-white shadow-lg shadow-pink-600/30 scale-105'
+                    : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 hover:border-pink-500'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {currentList.map((item) => {
+          {(() => {
+            const baseList = activeTab === 'games' ? GAMES : APPS;
+            const currentList = baseList.filter(item => {
+              if (activeTab === 'apps') return true;
+              if (selectedCategory === 'All') return true;
+              return item.category?.toLowerCase() === selectedCategory.toLowerCase();
+            });
+            return currentList.map((item) => {
             const players = getPlayersForGame(item.title);
             return (
               <motion.div
@@ -292,7 +319,8 @@ export function GamesApps() {
                 </div>
               </motion.div>
             );
-          })}
+          });
+          })()}
         </div>
       </div>
       </div>
