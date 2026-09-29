@@ -195,14 +195,24 @@
         let lyricsData = [];
         let isLyricMode = false;
 
+        const WORKER_URL_PRIMARY = "https://0.4texasplayz4.workers.dev";
+        const WORKER_URL_FALLBACK = "https://centraltok.zaellacruze1.workers.dev";
+        const CLIENT_ID = "so5r9Dsxv6jJRgHa5fGXfevkxr4VgNJf";
+
         function cleanQuery(str) {
             return str.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '+');
         }
 
         async function execSearch(query) {
             try {
-                const res = await fetch(`https://0.4texasplayz4.workers.dev/s/${cleanQuery(query)}`);
-                const data = await res.json();
+                let data;
+                try {
+                    const res = await fetch(`${WORKER_URL_PRIMARY}/s/${cleanQuery(query)}`);
+                    data = await res.json();
+                } catch(e) {
+                    const res2 = await fetch(`${WORKER_URL_FALLBACK}/s/${cleanQuery(query)}`);
+                    data = await res2.json();
+                }
                 const results = data.results || data; 
                 const container = document.getElementById('search-results');
                 container.innerHTML = '';
@@ -227,8 +237,14 @@
 
             try {
                 const slug = track.url.replace(/https?:\/\/soundcloud\.com\//, '');
-                const res = await fetch(`https://0.4texasplayz4.workers.dev/d/${slug}`);
-                const data = await res.json();
+                let data;
+                try {
+                    const res = await fetch(`${WORKER_URL_PRIMARY}/d/${slug}`);
+                    data = await res.json();
+                } catch(e) {
+                    const res2 = await fetch(`${WORKER_URL_FALLBACK}/d/${slug}`);
+                    data = await res2.json();
+                }
                 
                 currentTrackData = data;
                 audio.src = data.streamUrl;
