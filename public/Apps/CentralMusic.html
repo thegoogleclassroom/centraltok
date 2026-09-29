@@ -236,21 +236,31 @@
                 }
             }
 
+            let list = [];
+            if (Array.isArray(results)) {
+                list = results;
+            } else if (results && Array.isArray(results.results)) {
+                list = results.results;
+            } else if (results && typeof results === 'object') {
+                const found = Object.values(results).find(v => Array.isArray(v));
+                list = found || [];
+            }
+
             container.innerHTML = '';
-            if (!results || results.length === 0) {
+            if (!list || list.length === 0) {
                 container.innerHTML = '<div style="color:var(--text-dim); grid-column: 1/-1; text-align:center; padding:20px;">No audio signals found. Try another search.</div>';
                 return;
             }
 
-            results.forEach(t => {
+            list.forEach(t => {
                 const card = document.createElement('div');
                 card.style.cssText = "background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; transition:0.2s;";
                 card.onmouseover = () => card.style.borderColor = "var(--accent)";
                 card.onmouseout = () => card.style.borderColor = "transparent";
                 card.onclick = () => { addToQueue(t); hideOverlays(); };
-                card.innerHTML = `<img src="${t.artwork || ''}" style="width:100%; aspect-ratio:1; border-radius:10px; object-fit:cover; margin-bottom:10px; background:#0a192f;">
-                                  <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.9rem;">${t.title}</div>
-                                  <div style="color:var(--text-dim); font-size:0.7rem;">${t.artist}</div>`;
+                card.innerHTML = `<img src="${t.artwork || t.artworkUrl100 || ''}" style="width:100%; aspect-ratio:1; border-radius:10px; object-fit:cover; margin-bottom:10px; background:#0a192f;">
+                                  <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.9rem;">${t.title || t.trackName}</div>
+                                  <div style="color:var(--text-dim); font-size:0.7rem;">${t.artist || t.artistName}</div>`;
                 container.appendChild(card);
             });
         }
