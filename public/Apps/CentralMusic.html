@@ -394,6 +394,7 @@
 
         async function fetchLyrics(artist, title) {
             lyricsContainer.innerHTML = '<p class="lyric-line" style="color:var(--accent)">Scanning Satellite Data...</p>';
+            let synced = false;
             try {
                 const res = await fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(title)}`);
                 const data = await res.json();
@@ -403,9 +404,26 @@
                         const m = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
                         return m ? { time: parseInt(m[1]) * 60 + parseFloat(m[2]), text: m[3] } : null;
                     }).filter(x => x);
-                    lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
+                    if (lyricsData.length > 0) {
+                        synced = true;
+                        lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
+                    }
                 }
-            } catch (e) { lyricsContainer.innerHTML = ''; }
+            } catch (e) {}
+
+            if (!synced) {
+                const fallbackTexts = [
+                    `♪ Playing ${title} ♪`,
+                    `Artist: ${artist}`,
+                    `Feel the rhythm flowing...`,
+                    `Aura OS Audio Stream`,
+                    `${title} - Live Mix`,
+                    `Enjoy the vibe...`,
+                    `Keep the music playing ♪`
+                ];
+                lyricsData = fallbackTexts.map((text, i) => ({ time: i * 5, text }));
+                lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
+            }
         }
 
         function broadcastState() {
