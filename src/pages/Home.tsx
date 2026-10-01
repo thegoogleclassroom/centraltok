@@ -968,11 +968,28 @@ export const VideoItem: React.FC<{
       ref={containerRef} 
       className="w-full h-full snap-start relative bg-black flex items-center justify-center group overflow-hidden"
     >
-      <AmbientGlow 
-        src={video.isYouTube ? `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg` : (video.videoUrl || video.thumbnailUrl)} 
-        type={isImageMedia ? 'image' : 'video'}
-      >
-        <div className="relative w-full h-full max-w-[450px] aspect-[9/16] bg-black shadow-2xl flex items-center justify-center">
+      {(() => {
+        const getThemeFrameClass = (style?: string) => {
+          switch (style) {
+            case 'gold':
+              return 'border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.6)] rounded-[2.5rem] overflow-hidden';
+            case 'emerald':
+              return 'border-4 border-emerald-400 shadow-[0_0_30px_rgba(52,211,153,0.6)] rounded-[2.5rem] overflow-hidden';
+            case 'purple':
+              return 'border-4 border-purple-500 shadow-[0_0_30px_rgba(168,85,247,0.6)] rounded-[2.5rem] overflow-hidden';
+            case 'sunset':
+              return 'border-4 border-pink-500 shadow-[0_0_30px_rgba(236,72,153,0.6)] rounded-[2.5rem] overflow-hidden';
+            case 'cyber':
+            default:
+              return 'border-4 border-cyan-400 shadow-[0_0_30px_rgba(0,242,254,0.6)] rounded-[2.5rem] overflow-hidden';
+          }
+        };
+        return (
+          <AmbientGlow 
+            src={video.isYouTube ? `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg` : (video.videoUrl || video.thumbnailUrl)} 
+            type={isImageMedia ? 'image' : 'video'}
+          >
+            <div className={`relative w-full h-full max-w-[450px] aspect-[9/16] bg-black shadow-2xl flex items-center justify-center m-2 ${getThemeFrameClass(video.user?.themeStyle)}`}>
           {/* Main Media Content */}
           <div 
             className="relative w-full h-full cursor-pointer group/vid" 
@@ -1251,7 +1268,8 @@ export const VideoItem: React.FC<{
             </div>
           </div>
         </div>
-      </AmbientGlow>
+      </AmbientGlow>);
+      })()}
       
       {showComments && (
         <>

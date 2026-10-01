@@ -19,6 +19,7 @@ export type User = {
   password?: string;
   isGhostMode?: boolean;
   isVerified?: boolean;
+  themeStyle?: string;
   acceptedReportsCount?: number;
   banStatus?: {
     type: 'temp' | 'perm' | 'hwid';
@@ -81,6 +82,7 @@ export type Video = {
   viewedBy?: string[]; // User IDs or anonymous session IDs
   filter: string;
   musicId?: string;
+  musicStartTime?: number;
   textOverlays?: {
     id: string;
     text: string;
@@ -109,6 +111,7 @@ export type Story = {
   viewers?: string[]; // User IDs who viewed
   filter?: string;
   musicId?: string;
+  musicStartTime?: number;
   textOverlays?: {
     id: string;
     text: string;

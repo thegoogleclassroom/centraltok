@@ -13,7 +13,7 @@ import { compressImage } from '../lib/imageUtils';
 import { 
   Settings, Play, Edit3, Grid, Heart, X, Upload, Bookmark, Flag, 
   Hammer, Wrench, Check, Trash2, HelpCircle, Users, Lock, Image as ImageIcon, LogOut,
-  AlertTriangle, Send, ShieldCheck, Trophy, Phone, Video as VideoIcon, Eye, EyeOff, Key, User as UserIcon
+  AlertTriangle, Send, ShieldCheck, Trophy, Phone, Video as VideoIcon, Eye, EyeOff, Key, User as UserIcon, Sparkles
 } from 'lucide-react';
 import { VideoItem } from './Home';
 import { HolographicBadge } from '../components/UIPolish';
@@ -54,6 +54,7 @@ export function Profile() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'videos' | 'liked' | 'favorites' | 'removed'>('videos');
   const [showEdit, setShowEdit] = useState(false);
+  const [showThemePreview, setShowThemePreview] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [appealVideo, setAppealVideo] = useState<Video | null>(null);
   const [appealReason, setAppealReason] = useState('');
@@ -278,6 +279,9 @@ export function Profile() {
                 <>
                   <button onClick={() => setShowEdit(true)} className="px-6 py-2 border border-zinc-300 dark:border-zinc-700 font-semibold rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors flex items-center gap-2">
                     <Edit3 size={18} /> Edit profile
+                  </button>
+                  <button onClick={() => setShowThemePreview(true)} className="px-4 py-2 border border-pink-500/50 bg-pink-500/10 text-pink-600 dark:text-pink-400 font-semibold rounded-md hover:bg-pink-500/20 transition-colors flex items-center gap-1.5" title="Theme Studio Preview">
+                    <Sparkles size={18} /> Theme
                   </button>
                   <button onClick={() => setShowEdit(true)} className="px-4 py-2 border border-zinc-300 dark:border-zinc-700 font-semibold rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
                     <Settings size={18} />
@@ -558,6 +562,158 @@ export function Profile() {
           </div>
         </div>
       )}
+
+      {showThemePreview && currentUser && (
+        <ThemePreviewModal user={currentUser} onClose={() => setShowThemePreview(false)} />
+      )}
+    </div>
+  );
+}
+
+function ThemePreviewModal({ user, onClose }: { user: User, onClose: () => void }) {
+  const { setCurrentUser } = useAppStore();
+  const [activeTheme, setActiveTheme] = useState(user.themeStyle || 'cyber');
+  const [showLockInfo, setShowLockInfo] = useState(false);
+
+  const isEligible = user.isVerified || user.role === 'staff' || user.role === 'owner' || (user.badges || []).includes('Tradient');
+
+  const THEMES = [
+    { id: 'cyber', name: 'Neon Cyber', free: true, color: 'from-cyan-400 to-blue-600', frameClass: 'border-4 border-cyan-400 shadow-[0_0_30px_rgba(0,242,254,0.6)]' },
+    { id: 'gold', name: 'Royal Gold', free: false, color: 'from-amber-400 to-yellow-600', frameClass: 'border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.6)]' },
+    { id: 'emerald', name: 'Emerald Forest', free: false, color: 'from-emerald-400 to-green-600', frameClass: 'border-4 border-emerald-400 shadow-[0_0_30px_rgba(52,211,153,0.6)]' },
+    { id: 'purple', name: 'Midnight Purple', free: false, color: 'from-purple-400 to-indigo-600', frameClass: 'border-4 border-purple-500 shadow-[0_0_30px_rgba(168,85,247,0.6)]' },
+    { id: 'sunset', name: 'Sunset Glow', free: false, color: 'from-pink-500 to-rose-600', frameClass: 'border-4 border-pink-500 shadow-[0_0_30px_rgba(236,72,153,0.6)]' },
+  ];
+
+  const currentThemeObj = THEMES.find(t => t.id === activeTheme) || THEMES[0];
+  const isLocked = !currentThemeObj.free && !isEligible;
+
+  const handleApply = async () => {
+    if (isLocked) {
+      setShowLockInfo(true);
+      return;
+    }
+    try {
+      await updateUser(user.id, { themeStyle: activeTheme });
+      setCurrentUser({ ...user, themeStyle: activeTheme });
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to apply theme.");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+      <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="flex items-center gap-2">
+            <Sparkles className="text-pink-500" size={24} />
+            <h3 className="text-xl font-black uppercase tracking-tight">Theme Preview Studio</h3>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"><X size={20} /></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left: Theme Selector */}
+          <div className="space-y-3">
+            <p className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2">Select a Theme</p>
+            {THEMES.map(t => {
+              const locked = !t.free && !isEligible;
+              return (
+                <div
+                  key={t.id}
+                  onClick={() => setActiveTheme(t.id)}
+                  className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${
+                    activeTheme === t.id 
+                      ? 'border-pink-600 bg-pink-500/10 shadow-lg' 
+                      : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-400'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm shadow`}>
+                      {t.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">{t.name}</p>
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{t.free ? 'Free Theme' : locked ? 'Locked (Tradient/Verified)' : 'Unlocked'}</p>
+                    </div>
+                  </div>
+                  {locked && <Lock size={16} className="text-amber-400" />}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Right: Live Account Preview */}
+          <div className="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center relative overflow-hidden">
+            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-[10px] font-bold">
+              Live Preview
+            </div>
+
+            {/* Profile Preview Avatar & Frame */}
+            <div className={`relative w-24 h-24 rounded-full mb-4 flex items-center justify-center overflow-hidden ${currentThemeObj.frameClass}`}>
+              {user.avatarUrl ? (
+                <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-white font-bold text-2xl">{user.username.charAt(0)}</div>
+              )}
+            </div>
+
+            <h4 className="font-bold text-lg mb-1">@{user.handle}</h4>
+            <p className="text-xs text-zinc-500 mb-4 max-w-xs">{user.bio || 'Previewing theme appearance across profile and video frames.'}</p>
+
+            {/* Video Frame Preview Box */}
+            <div className={`w-full h-32 bg-black rounded-2xl overflow-hidden flex items-center justify-center relative mb-4 ${currentThemeObj.frameClass}`}>
+              <div className="absolute inset-0 bg-gradient-to-tr from-pink-600/30 to-purple-600/30 flex items-center justify-center">
+                <span className="text-xs font-black uppercase tracking-widest text-white drop-shadow">Video Frame Preview</span>
+              </div>
+            </div>
+
+            {isLocked ? (
+              <button 
+                onClick={() => setShowLockInfo(true)}
+                className="w-full py-3 bg-gradient-to-r from-amber-500 to-pink-600 hover:opacity-90 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg transition-all"
+              >
+                🔒 Unlock This Theme
+              </button>
+            ) : (
+              <button 
+                onClick={handleApply}
+                className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg transition-all"
+              >
+                Apply Theme To Profile
+              </button>
+            )}
+          </div>
+        </div>
+
+        {showLockInfo && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 text-center">
+              <div className="w-12 h-12 bg-amber-500/20 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Lock size={24} />
+              </div>
+              <h3 className="text-lg font-bold mb-2">🔒 Unlock {currentThemeObj.name}</h3>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
+                To unlock exclusive profile themes and customized video picture frames, you need the <span className="font-bold text-pink-600">Tradient</span> or <span className="font-bold text-blue-500">Verified</span> badge.
+              </p>
+              <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded-xl text-left text-xs space-y-2 mb-4 text-zinc-700 dark:text-zinc-300">
+                <p className="font-bold text-zinc-900 dark:text-white">How to get Tradient or Verified:</p>
+                <p>• Help keep our community safe by reporting bugs & malicious content.</p>
+                <p>• Apply for verification through the "Be Verified" button on your profile.</p>
+                <p>• Maintain an active and trusted track record in our forums!</p>
+              </div>
+              <button 
+                onClick={() => setShowLockInfo(false)}
+                className="w-full py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-colors shadow-lg"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -576,6 +732,18 @@ function EditProfileModal({ user, onClose }: { user: User, onClose: () => void }
   const [showPassword, setShowPassword] = useState(false);
   const [showActivityStatus, setShowActivityStatus] = useState(user.showActivityStatus !== false);
   const [isGhostMode, setIsGhostMode] = useState(user.isGhostMode || false);
+  const [themeStyle, setThemeStyle] = useState(user.themeStyle || 'cyber');
+  const [showLockInfo, setShowLockInfo] = useState(false);
+
+  const isEligible = user.isVerified || user.role === 'staff' || user.role === 'owner' || (user.badges || []).includes('Tradient');
+
+  const THEMES = [
+    { id: 'cyber', name: 'Neon Cyber', free: true, color: 'from-cyan-400 to-blue-600' },
+    { id: 'gold', name: 'Royal Gold', free: false, color: 'from-amber-400 to-yellow-600' },
+    { id: 'emerald', name: 'Emerald Forest', free: false, color: 'from-emerald-400 to-green-600' },
+    { id: 'purple', name: 'Midnight Purple', free: false, color: 'from-purple-400 to-indigo-600' },
+    { id: 'sunset', name: 'Sunset Glow', free: false, color: 'from-pink-500 to-rose-600' },
+  ];
 
   // Verification State
   const [showVerifModal, setShowVerifModal] = useState(false);
@@ -599,7 +767,8 @@ function EditProfileModal({ user, onClose }: { user: User, onClose: () => void }
         avatarUrl,
         password,
         showActivityStatus,
-        isGhostMode
+        isGhostMode,
+        themeStyle
       };
       
       await updateUser(user.id, updateData);
@@ -722,6 +891,73 @@ function EditProfileModal({ user, onClose }: { user: User, onClose: () => void }
                   <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${isPrivate ? 'translate-x-6' : 'translate-x-0'}`} />
                 </button>
               </div>
+
+              <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                <label className="block text-sm font-bold mb-2 flex items-center gap-2">
+                  <Sparkles size={16} className="text-pink-500" /> Profile Theme & Video Frame
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {THEMES.map(t => {
+                    const isLocked = !t.free && !isEligible;
+                    return (
+                      <div 
+                        key={t.id}
+                        onClick={() => {
+                          if (isLocked) {
+                            setShowLockInfo(true);
+                          } else {
+                            setThemeStyle(t.id);
+                          }
+                        }}
+                        className={`relative p-3 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-3 ${
+                          themeStyle === t.id 
+                            ? 'border-pink-600 bg-pink-500/10 shadow-md' 
+                            : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-400'
+                        }`}
+                      >
+                        {isLocked && (
+                          <div className="absolute -top-2.5 -right-2.5 bg-zinc-900 text-amber-400 p-1 rounded-full shadow border border-amber-400/50">
+                            <Lock size={14} />
+                          </div>
+                        )}
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-xs`}>
+                          {t.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold">{t.name}</p>
+                          <p className="text-[10px] text-zinc-500">{isLocked ? 'Locked (Tradient/Verified)' : 'Unlocked'}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {showLockInfo && (
+                <div className="fixed inset-0 z-[75] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+                  <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 text-center">
+                    <div className="w-12 h-12 bg-amber-500/20 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Lock size={24} />
+                    </div>
+                    <h3 className="text-lg font-bold mb-2">🔒 Premium Theme Locked</h3>
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
+                      To unlock exclusive profile themes and customized video picture frames, you need the <span className="font-bold text-pink-600">Tradient</span> or <span className="font-bold text-blue-500">Verified</span> badge.
+                    </p>
+                    <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded-xl text-left text-xs space-y-2 mb-4 text-zinc-700 dark:text-zinc-300">
+                      <p className="font-bold text-zinc-900 dark:text-white">How to get Tradient or Verified:</p>
+                      <p>• Help keep our community safe by reporting bugs & malicious content.</p>
+                      <p>• Apply for verification through the "Be Verified" button on your profile.</p>
+                      <p>• Maintain an active and trusted track record in our forums!</p>
+                    </div>
+                    <button 
+                      onClick={() => setShowLockInfo(false)}
+                      className="w-full py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-colors shadow-lg shadow-pink-600/20"
+                    >
+                      Got It
+                    </button>
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <>

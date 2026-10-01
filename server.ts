@@ -221,12 +221,25 @@ Return ONLY a valid JSON array of these objects. No markdown formatting, no extr
           maxResults, 
           q: searchQuery, 
           type: 'video', 
-          videoDuration: 'short', 
+          videoDuration: 'short',
+          relevanceLanguage: 'en',
           key: apiKey
         });
         if (pageToken) queryParams.append('pageToken', pageToken);
         const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${queryParams.toString()}`);
-        if (response.ok) return res.json(await response.json());
+        if (response.ok) {
+          const data = await response.json();
+          // Filter items to ensure English only titles (Latin alphabet dominance)
+          if (data.items) {
+            data.items = data.items.filter((item: any) => {
+              const title = item.snippet?.title || '';
+              // Check if title has reasonable ASCII/Latin character ratio
+              const asciiCount = (title.match(/[a-zA-Z0-9\s.,!?#@]/g) || []).length;
+              return asciiCount / (title.length || 1) > 0.4;
+            });
+          }
+          return res.json(data);
+        }
       }
       res.status(503).json({
         error: 'The Servers are Overloaded, This will be fixed shortly',

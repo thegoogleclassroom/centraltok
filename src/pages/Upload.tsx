@@ -49,6 +49,7 @@ export function Upload() {
   
   // Editor States
   const [selectedMusic, setSelectedMusic] = useState<typeof SONGS[0] | null>(null);
+  const [musicStartTime, setMusicStartTime] = useState(0);
   const [textOverlays, setTextOverlays] = useState<{ id: string, text: string, x: number, y: number, animation: string, fontSize: number, color: string }[]>([]);
   const [activeTextId, setActiveTextId] = useState<string | null>(null);
   const [showMusicPicker, setShowMusicPicker] = useState(false);
@@ -251,6 +252,7 @@ export function Upload() {
           visibility: visibility,
           viewers: [],
           musicId: selectedMusic?.id,
+          musicStartTime: musicStartTime,
           textOverlays: textOverlays
         };
         await saveStories([newStory, ...stories]);
@@ -271,6 +273,7 @@ export function Upload() {
           mediaType: mediaType,
           visibility: visibility,
           musicId: selectedMusic?.id,
+          musicStartTime: musicStartTime,
           textOverlays: textOverlays
         };
         
@@ -638,6 +641,30 @@ export function Upload() {
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {selectedMusic && (
+              <div className="mt-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                  <Music size={20} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between text-xs font-bold mb-1">
+                    <span>{selectedMusic.name} - {selectedMusic.artist}</span>
+                    <span>Start: {musicStartTime}s</span>
+                  </div>
+                  <input 
+                    type="range"
+                    min="0"
+                    max="30"
+                    value={musicStartTime}
+                    onChange={(e) => setMusicStartTime(Number(e.target.value))}
+                    className="w-full accent-indigo-600 cursor-pointer"
+                  />
+                  <p className="text-[10px] text-zinc-500 mt-1">Drag to adjust where the song plays in your video timeline.</p>
+                </div>
+                <button onClick={() => setSelectedMusic(null)} className="text-zinc-400 hover:text-red-500 text-xs font-bold p-2">Remove</button>
               </div>
             )}
           </div>

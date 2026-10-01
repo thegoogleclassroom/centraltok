@@ -396,29 +396,30 @@
             lyricsContainer.innerHTML = '<p class="lyric-line" style="color:var(--accent)">Scanning Satellite Data...</p>';
             let synced = false;
             try {
-                const res = await fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(title)}`);
-                const data = await res.json();
-                if (data.syncedLyrics) {
-                    const lines = data.syncedLyrics.split('\n');
-                    lyricsData = lines.map(line => {
-                        const m = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
-                        return m ? { time: parseInt(m[1]) * 60 + parseFloat(m[2]), text: m[3] } : null;
-                    }).filter(x => x);
-                    if (lyricsData.length > 0) {
-                        synced = true;
-                        lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
-                    }
-                } else if (data.plainLyrics) {
-                    const lines = data.plainLyrics.split('\n').filter(l => l.trim().length > 0);
-                    lyricsData = lines.map((text, i) => ({ time: i * 4, text }));
-                    if (lyricsData.length > 0) {
-                        synced = true;
-                        lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
+                const res = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(artist + ' ' + title)}`);
+                if (res.ok) {
+                    const list = await res.json();
+                    if (Array.isArray(list) && list.length > 0) {
+                        const match = list[0];
+                        if (match.syncedLyrics) {
+                            const lines = match.syncedLyrics.split('\n');
+                            lyricsData = lines.map(line => {
+                                const m = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
+                                return m ? { time: parseInt(m[1]) * 60 + parseFloat(m[2]), text: m[3] } : null;
+                            }).filter(x => x);
+                            if (lyricsData.length > 0) synced = true;
+                        } else if (match.plainLyrics) {
+                            const lines = match.plainLyrics.split('\n').filter(l => l.trim().length > 0);
+                            lyricsData = lines.map((text, i) => ({ time: i * 4, text }));
+                            if (lyricsData.length > 0) synced = true;
+                        }
                     }
                 }
             } catch (e) {}
 
-            if (!synced) {
+            if (synced) {
+                lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
+            } else {
                 const fallbackTexts = [
                     `♪ Playing ${title} ♪`,
                     `Artist: ${artist}`,
