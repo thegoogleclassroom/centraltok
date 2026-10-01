@@ -408,6 +408,13 @@
                         synced = true;
                         lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
                     }
+                } else if (data.plainLyrics) {
+                    const lines = data.plainLyrics.split('\n').filter(l => l.trim().length > 0);
+                    lyricsData = lines.map((text, i) => ({ time: i * 4, text }));
+                    if (lyricsData.length > 0) {
+                        synced = true;
+                        lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
+                    }
                 }
             } catch (e) {}
 

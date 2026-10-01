@@ -24,6 +24,8 @@ import { UpdatesAnnouncements } from './pages/UpdatesAnnouncements';
 import { SneakPeeks } from './pages/SneakPeeks';
 import { GamesApps } from './pages/GamesApps';
 
+import { BookmarkBanner } from './components/BookmarkBanner';
+
 function AuthWrapper({ children }: { children: React.ReactNode }) {
   const { currentUser } = useAppStore();
   
@@ -36,6 +38,7 @@ function AuthWrapper({ children }: { children: React.ReactNode }) {
   
   return (
     <>
+      <BookmarkBanner />
       {children}
       <InterestsModal />
       <GlobalStoryViewer />
