@@ -366,14 +366,31 @@ export function Profile() {
         
         {/* Tab Content Grid */}
         <div className="grid grid-cols-3 gap-0.5 md:gap-1 p-0.5 md:p-1">
-            {(activeTab === 'videos' ? videos : activeTab === 'liked' ? likedVideos : activeTab === 'favorites' ? favoriteVideos : removedVideos).map(video => {
-              const canDelete = currentUser?.id === video.userId || isStaffOrOwner;
-              const isImage = video.mediaType === 'image';
-              const hasPendingAppeal = myAppeals.some(a => a.videoId === video.id && a.status === 'pending');
-              const hasRejectedAppeal = myAppeals.some(a => a.videoId === video.id && a.status === 'rejected');
-              
-              return (
-                <div key={video.id} className="aspect-[3/4] relative bg-black group cursor-pointer overflow-hidden rounded-sm">
+            {(() => {
+              const getThemeFrameClass = (style?: string) => {
+                switch (style) {
+                  case 'gold':
+                    return 'border-2 border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.5)] rounded-2xl overflow-hidden';
+                  case 'emerald':
+                    return 'border-2 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.5)] rounded-2xl overflow-hidden';
+                  case 'purple':
+                    return 'border-2 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.5)] rounded-2xl overflow-hidden';
+                  case 'sunset':
+                    return 'border-2 border-pink-500 shadow-[0_0_30px_rgba(236,72,153,0.5)] rounded-2xl overflow-hidden';
+                  case 'cyber':
+                  default:
+                    return 'border-2 border-cyan-400 shadow-[0_0_20px_rgba(0,242,254,0.5)] rounded-2xl overflow-hidden';
+                }
+              };
+              const items = activeTab === 'videos' ? videos : activeTab === 'liked' ? likedVideos : activeTab === 'favorites' ? favoriteVideos : removedVideos;
+              return items.map(video => {
+                const canDelete = currentUser?.id === video.userId || isStaffOrOwner;
+                const isImage = video.mediaType === 'image';
+                const hasPendingAppeal = myAppeals.some(a => a.videoId === video.id && a.status === 'pending');
+                const hasRejectedAppeal = myAppeals.some(a => a.videoId === video.id && a.status === 'rejected');
+                
+                return (
+                  <div key={video.id} className={`aspect-[3/4] relative bg-black group cursor-pointer overflow-hidden m-1 ${getThemeFrameClass(profileUser?.themeStyle)}`}>
                   <div onClick={() => setSelectedVideo(video)} className="w-full h-full">
                     {isImage ? (
                       <img src={video.videoUrl} alt={video.description} className="w-full h-full object-cover" />
@@ -450,8 +467,9 @@ export function Profile() {
                   )}
                 </div>
               );
-            })}
-            {(activeTab === 'videos' ? videos : activeTab === 'liked' ? likedVideos : activeTab === 'favorites' ? favoriteVideos : removedVideos).length === 0 && (
+            });
+          })()}
+          {(activeTab === 'videos' ? videos : activeTab === 'liked' ? likedVideos : activeTab === 'favorites' ? favoriteVideos : removedVideos).length === 0 && (
               <div className="col-span-3 py-20 text-center text-zinc-500">
                 No posts found in this tab.
               </div>

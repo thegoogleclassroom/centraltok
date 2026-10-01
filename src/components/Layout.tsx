@@ -299,97 +299,107 @@ export function Layout({ children }: { children: React.ReactNode }) {
             opacity: isGameActive ? 0 : 1
           }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="hidden md:flex flex-col border-r border-zinc-200 dark:border-zinc-800 p-4 shrink-0 h-full bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl z-50 overflow-hidden"
+          className="hidden md:flex flex-col border-r border-zinc-200/80 dark:border-zinc-800/80 p-4 shrink-0 h-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-2xl z-50 overflow-hidden shadow-[4px_0_24px_rgba(0,0,0,0.02)]"
         >
-          <Link to="/" className="flex flex-col gap-1 mb-8 px-2 group">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-black dark:bg-white text-white dark:text-black rounded-xl flex items-center justify-center font-black text-2xl leading-none transform transition-transform group-hover:rotate-6 group-hover:scale-110">C</div>
-              <span className="text-2xl font-black tracking-tighter">Central<span className="text-pink-600">Tok</span></span>
+          <Link to="/" className="flex flex-col gap-1 mb-6 px-2 group">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 bg-gradient-to-tr from-pink-600 via-purple-600 to-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-2xl leading-none transform transition-transform group-hover:rotate-6 group-hover:scale-110 shadow-lg shadow-pink-500/20">C</div>
+              <div>
+                <span className="text-2xl font-black tracking-tighter">Central<span className="text-pink-600">Tok</span></span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400">Social Experience</span>
+              </div>
             </div>
           </Link>
-          <div className="text-[10px] text-zinc-500 mb-6 bg-zinc-100/50 dark:bg-zinc-900/50 backdrop-blur-md p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 leading-relaxed shadow-sm">
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="bg-pink-600 text-white px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">BETA v0.9</span>
-              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+
+          <div className="text-[11px] text-zinc-500 mb-6 bg-gradient-to-br from-zinc-100/80 to-zinc-200/40 dark:from-zinc-900/80 dark:to-zinc-900/40 backdrop-blur-md p-3.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 leading-relaxed shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-gradient-to-r from-pink-600 to-purple-600 text-white px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest shadow-sm">BETA v1.0</span>
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
               {currentUser && !currentUser.isVerified && (
                 <button 
                   onClick={() => setShowVerificationModal(true)}
-                  className="ml-auto flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 px-2.5 py-1 rounded-lg transition-all hover:scale-105 active:scale-95 shadow-sm border border-blue-500/20"
+                  className="ml-auto flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 px-2.5 py-1 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-sm border border-blue-500/25"
                 >
-                  <ShieldCheck size={12} strokeWidth={3} /> Be Verified
+                  <ShieldCheck size={12} strokeWidth={3} /> Verify
                 </button>
               )}
             </div>
-            Bugs might appear. If so, please contact <button onClick={() => setShowSupportModal(true)} className="text-blue-500 dark:text-blue-400 hover:underline font-bold inline">support</button>
+            Bugs or feedback? Reach out to our <button onClick={() => setShowSupportModal(true)} className="text-blue-500 dark:text-blue-400 hover:underline font-bold inline">support desk</button>.
           </div>
         
-        <nav className="flex-1 space-y-2">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path || (item.path === '/forum' && location.pathname.startsWith('/forum'));
-            const isMessages = item.label === 'Messages';
-            return (
-              <Link 
-                key={item.label} 
-                to={item.path}
-                onClick={(e) => handleNavClick(e, item.path)}
-                className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all relative group ${isActive ? 'text-pink-600 font-black bg-pink-500/10 border border-pink-500/20 shadow-[0_0_20px_rgba(236,72,153,0.1)]' : 'hover:bg-zinc-100 dark:hover:bg-white/5 font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
-              >
-                <item.icon className={`transition-all ${isActive ? 'fill-current scale-110' : 'group-hover:scale-110'}`} size={24} strokeWidth={isActive ? 3 : 2} />
-                <span className="text-lg tracking-tight">{item.label}</span>
-                {isMessages && unreadCount > 0 && (
-                  <span className="ml-auto bg-pink-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(236,72,153,0.4)]">
-                    {unreadCount}
-                  </span>
-                )}
-                {isActive && (
-                  <motion.div layoutId="nav-active" className="absolute left-0 w-1 h-8 bg-pink-600 rounded-r-full" />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+          <nav className="flex-1 space-y-1.5 overflow-y-auto pr-1">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path || (item.path === '/forum' && location.pathname.startsWith('/forum'));
+              const isMessages = item.label === 'Messages';
+              return (
+                <Link 
+                  key={item.label} 
+                  to={item.path}
+                  onClick={(e) => handleNavClick(e, item.path)}
+                  className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all relative group ${isActive ? 'text-pink-600 dark:text-pink-500 font-black bg-pink-500/10 border border-pink-500/20 shadow-[0_4px_20px_rgba(236,72,153,0.15)]' : 'hover:bg-zinc-100 dark:hover:bg-white/5 font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+                >
+                  <item.icon className={`transition-all ${isActive ? 'fill-current scale-110 drop-shadow-[0_0_8px_rgba(236,72,153,0.4)]' : 'group-hover:scale-110'}`} size={22} strokeWidth={isActive ? 3 : 2} />
+                  <span className="text-base tracking-tight">{item.label}</span>
+                  {isMessages && unreadCount > 0 && (
+                    <span className="ml-auto bg-pink-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-[0_0_12px_rgba(236,72,153,0.5)] animate-bounce">
+                      {unreadCount}
+                    </span>
+                  )}
+                  {isActive && (
+                    <motion.div layoutId="nav-active" className="absolute left-0 w-1.5 h-7 bg-pink-600 rounded-r-full shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
         
-        <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
-          <Link 
-            to="/upload"
-            onClick={(e) => handleNavClick(e, '/upload')}
-            className="group relative flex items-center justify-center gap-3 w-full bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white py-4 rounded-2xl font-black tracking-widest shadow-[0_10px_20px_rgba(236,72,153,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <PlusSquare size={22} strokeWidth={3} />
-            <span className="uppercase text-sm">Upload</span>
-          </Link>
-          
-          <button 
-            onClick={toggleTheme}
-            className="flex items-center gap-3 w-full px-3 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors font-medium"
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-            <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
-          </button>
-          
-          {!currentUser ? (
-            <button 
-              onClick={() => setShowAuthModal(true)}
-              className="flex items-center justify-center gap-2 w-full border-2 border-pink-600 text-pink-600 dark:text-pink-500 py-2 rounded-xl font-semibold hover:bg-pink-50 dark:hover:bg-pink-950/20 transition-colors"
+          <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+            <Link 
+              to="/upload"
+              onClick={(e) => handleNavClick(e, '/upload')}
+              className="group relative flex items-center justify-center gap-2.5 w-full bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:opacity-95 text-white py-3.5 rounded-2xl font-black tracking-widest shadow-[0_8px_25px_rgba(236,72,153,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
             >
-              <LogIn size={20} />
-              <span>Log in</span>
-            </button>
-          ) : (
-            <div className="flex items-center gap-3 px-2 py-2">
-              <img src={currentUser.avatarUrl} alt={currentUser.username} className="w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-800" />
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm truncate flex items-center gap-1">
-                  {currentUser.username}
-                  {currentUser.isVerified && <HolographicBadge />}
-                </p>
-                <p className="text-xs text-zinc-500 truncate">@{currentUser.handle}</p>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <PlusSquare size={20} strokeWidth={3} />
+              <span className="uppercase text-xs">Create Post</span>
+            </Link>
+            
+            <button 
+              onClick={toggleTheme}
+              className="flex items-center justify-between w-full px-3.5 py-2.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition-colors font-semibold text-xs"
+            >
+              <div className="flex items-center gap-2.5">
+                {theme === 'dark' ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-indigo-600" />}
+                <span>Appearance</span>
               </div>
-            </div>
-          )}
-        </div>
-      </motion.div>
+              <span className="text-[10px] uppercase font-bold text-zinc-400 bg-zinc-200/60 dark:bg-zinc-800 px-2 py-0.5 rounded-md">{theme}</span>
+            </button>
+            
+            {!currentUser ? (
+              <button 
+                onClick={() => setShowAuthModal(true)}
+                className="flex items-center justify-center gap-2 w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-xl font-bold text-sm transition-colors shadow-lg shadow-pink-600/20"
+              >
+                <LogIn size={18} />
+                <span>Log in</span>
+              </button>
+            ) : (
+              <div 
+                onClick={() => navigate(`/@${currentUser.handle}`)}
+                className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/50"
+              >
+                <img src={currentUser.avatarUrl} alt={currentUser.username} className="w-10 h-10 rounded-xl object-cover border border-zinc-200 dark:border-zinc-800 shadow-sm" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm truncate flex items-center gap-1">
+                    {currentUser.username}
+                    {currentUser.isVerified && <HolographicBadge />}
+                  </p>
+                  <p className="text-xs text-zinc-500 truncate">@{currentUser.handle}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
       )}
 
       {/* Main Content */}

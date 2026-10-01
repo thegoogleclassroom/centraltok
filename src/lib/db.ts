@@ -24,19 +24,25 @@ export const subscribeToSuggestions = (callback: (suggestions: AppSuggestion[]) 
 
 export const getAnnouncements = () => fetchCollection<Announcement>('announcements');
 
-const cleanObject = (obj: any) => {
-  const newObj = { ...obj };
-  Object.keys(newObj).forEach(key => {
-    if (newObj[key] === undefined) {
-      delete newObj[key];
+const deepClean = (obj: any): any => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj === undefined ? null : obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(deepClean);
+  }
+  const cleaned: any = {};
+  Object.keys(obj).forEach(key => {
+    if (obj[key] !== undefined) {
+      cleaned[key] = deepClean(obj[key]);
     }
   });
-  return newObj;
+  return cleaned;
 };
 
 export const saveAnnouncement = async (announcement: Announcement) => {
   try {
-    const cleanedData = cleanObject(announcement);
+    const cleanedData = deepClean(announcement);
     const docRef = doc(db, 'announcements', announcement.id);
     await setDoc(docRef, cleanedData);
   } catch (err) {
@@ -66,7 +72,7 @@ export const voteInPoll = async (announcementId: string, userId: string, optionI
 
 export const submitVerificationRequest = async (request: VerificationRequest) => {
   try {
-    const cleanedData = cleanObject(request);
+    const cleanedData = deepClean(request);
     const docRef = doc(db, 'verification_requests', request.id);
     await setDoc(docRef, cleanedData);
   } catch (err) {
@@ -201,7 +207,7 @@ const saveCollection = async <T extends { id: string }>(collName: string, items:
       if ((dataToSave as any).videoData) {
         delete (dataToSave as any).videoData;
       }
-      dataToSave = JSON.parse(JSON.stringify(dataToSave));
+      dataToSave = deepClean(dataToSave);
       batch.set(docRef, dataToSave);
     });
     await batch.commit();
@@ -222,13 +228,7 @@ export const saveUsers = (users: User[]) => saveCollection('users', users);
 export const updateUser = async (userId: string, data: Partial<User>) => {
   try {
     const docRef = doc(db, 'users', userId);
-    const updateData: any = { ...data };
-    // Remove undefined values to avoid Firestore crash
-    Object.keys(updateData).forEach(key => {
-      if (updateData[key] === undefined) {
-        updateData[key] = null;
-      }
-    });
+    const updateData = deepClean(data);
     await updateDoc(docRef, updateData);
   } catch (err) {
     console.error("Error updating user:", userId, err);
@@ -260,7 +260,7 @@ export const ensureVideoInDB = async (video: Video) => {
     if (!snap.exists()) {
       let dbVideo = { ...video };
       delete dbVideo.videoData;
-      dbVideo = JSON.parse(JSON.stringify(dbVideo));
+      dbVideo = deepClean(dbVideo);
       await setDoc(docRef, dbVideo);
     }
   } catch (err) {
@@ -592,7 +592,7 @@ export const getSneakPeeks = () => fetchCollection<SneakPeek>('sneak_peeks');
 
 export const saveSneakPeek = async (peek: SneakPeek) => {
   try {
-    const cleaned = cleanObject(peek);
+    const cleaned = deepClean(peek);
     const docRef = doc(db, 'sneak_peeks', peek.id);
     await setDoc(docRef, cleaned);
   } catch (err) {
@@ -606,7 +606,7 @@ export const saveSneakPeeks = async (peeks: SneakPeek[]) => {
     const batch = writeBatch(db);
     peeks.forEach(item => {
       const docRef = doc(db, 'sneak_peeks', item.id);
-      const cleaned = cleanObject(item);
+      const cleaned = deepClean(item);
       batch.set(docRef, cleaned);
     });
     await batch.commit();
@@ -688,6 +688,8 @@ export const subscribeToAppSettings = (callback: (settings: any) => void) => {
         gamesAppsCrashed: false 
       });
     }
+  }, (err) => {
+    // Suppress connection warning
   });
 };
 
@@ -826,6 +828,8 @@ export const subscribeToWatchPartiesByGroup = (groupId: string, callback: (parti
       .map(doc => doc.data() as WatchParty)
       .filter(p => p.groupId === groupId);
     callback(parties);
+  }, (err) => {
+    // Suppress connection warning
   });
 };
 
@@ -882,7 +886,7 @@ export const initiateCall = async (callerId: string, receiverId: string, type: '
 export const updateCallStatus = async (callId: string, status: Call['status'], extra?: Partial<Call>) => {
   try {
     const callRef = doc(db, 'calls', callId);
-    await updateDoc(callRef, cleanObject({
+    await updateDoc(callRef, deepClean({
       ...extra,
       status,
       updatedAt: Date.now()
@@ -909,6 +913,8 @@ export const subscribeToIncomingCalls = (userId: string, callback: (calls: Call[
       .map(doc => doc.data() as Call)
       .filter(c => c.receiverId === userId && c.status === 'offering');
     callback(calls);
+  }, (err) => {
+    // Suppress connection warning
   });
 };
 
@@ -920,5 +926,7 @@ export const subscribeToCall = (callId: string, callback: (call: Call | null) =>
     } else {
       callback(null);
     }
+  }, (err) => {
+    // Suppress connection warning
   });
 };
