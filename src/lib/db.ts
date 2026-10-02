@@ -25,19 +25,16 @@ export const subscribeToSuggestions = (callback: (suggestions: AppSuggestion[]) 
 export const getAnnouncements = () => fetchCollection<Announcement>('announcements');
 
 const deepClean = (obj: any): any => {
-  if (obj === null || typeof obj !== 'object') {
-    return obj === undefined ? null : obj;
+  if (obj === null || obj === undefined) return null;
+  try {
+    return JSON.parse(JSON.stringify(obj, (key, value) => {
+      if (value === undefined) return null;
+      if (value instanceof Blob || value instanceof File || typeof value === 'function') return undefined;
+      return value;
+    }));
+  } catch (e) {
+    return {};
   }
-  if (Array.isArray(obj)) {
-    return obj.map(deepClean);
-  }
-  const cleaned: any = {};
-  Object.keys(obj).forEach(key => {
-    if (obj[key] !== undefined) {
-      cleaned[key] = deepClean(obj[key]);
-    }
-  });
-  return cleaned;
 };
 
 export const saveAnnouncement = async (announcement: Announcement) => {

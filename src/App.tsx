@@ -59,6 +59,7 @@ export default function App() {
               <Route path="/video/:videoId" element={<Home />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/upload" element={<Upload />} />
+              <Route path="/@:handle" element={<Profile />} />
               <Route path="/profile/:handle" element={<Profile />} />
               <Route path="/messages" element={<Inbox />} />
               <Route path="/messages/:handle" element={<Chat />} />
