@@ -203,35 +203,16 @@ export function Upload() {
     setIsUploading(true);
     
     try {
-      let downloadUrl = '';
+      let downloadUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
 
-      // Try uploading to cloud service if available
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'centraltok');
-        const uploadEndpoint = mediaType === 'image' ? 'image' : 'video';
-        
-        const res = await fetch(`https://api.cloudinary.com/v1_1/nmdsqhos/${uploadEndpoint}/upload`, {
-          method: 'POST',
-          body: formData
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          downloadUrl = data.secure_url;
-        }
-      } catch (cloudErr) {
-        console.warn("Cloudinary upload omitted or failed, storing media locally:", cloudErr);
-      }
-
-      // If cloud upload wasn't used or failed, fall back to base64 DataURL
       if (!downloadUrl) {
-        downloadUrl = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
-        });
+        alert("Failed to process media file. Please try again.");
+        setIsUploading(false);
+        return;
       }
 
       const descTags = description.split(' ').filter(t => t.startsWith('#'));
