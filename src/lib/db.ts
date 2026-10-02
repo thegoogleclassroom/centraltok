@@ -199,13 +199,18 @@ const saveCollection = async <T extends { id: string }>(collName: string, items:
     const batch = writeBatch(db);
     // writeBatch limits to 500, but we'll assume less for this quick migration
     items.forEach(item => {
-      const docRef = doc(db, collName, item.id);
-      let dataToSave = { ...item };
-      if ((dataToSave as any).videoData) {
-        delete (dataToSave as any).videoData;
+      try {
+        const docRef = doc(db, collName, item.id);
+        let dataToSave = deepClean(item);
+        if (dataToSave && typeof dataToSave === 'object') {
+          if ('videoData' in dataToSave) {
+            delete (dataToSave as any).videoData;
+          }
+          batch.set(docRef, dataToSave, { merge: true });
+        }
+      } catch (itemErr) {
+        console.error("Skipping malformed item in collection save:", itemErr);
       }
-      dataToSave = deepClean(dataToSave);
-      batch.set(docRef, dataToSave);
     });
     await batch.commit();
   } catch (err) {
