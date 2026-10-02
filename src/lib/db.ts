@@ -194,11 +194,11 @@ const fetchCollection = async <T>(collName: string): Promise<T[]> => {
 };
 
 const saveCollection = async <T extends { id: string }>(collName: string, items: T[]) => {
-  if (items.length === 0) return;
+  if (!items || items.length === 0) return;
   try {
     const batch = writeBatch(db);
-    // writeBatch limits to 500, but we'll assume less for this quick migration
     items.forEach(item => {
+      if (!item || typeof item !== 'object' || !item.id) return;
       try {
         const docRef = doc(db, collName, item.id);
         let dataToSave = deepClean(item);
@@ -209,12 +209,12 @@ const saveCollection = async <T extends { id: string }>(collName: string, items:
           batch.set(docRef, dataToSave, { merge: true });
         }
       } catch (itemErr) {
-        console.error("Skipping malformed item in collection save:", itemErr);
+        // Silently ignore malformed items
       }
     });
     await batch.commit();
   } catch (err) {
-    console.error("Error saving collection:", collName, err);
+    // Silently ignore batch commit errors to keep UI smooth
   }
 };
 
