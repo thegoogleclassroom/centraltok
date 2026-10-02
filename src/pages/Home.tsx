@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { 
-  getVideos, getUsers, saveUsers, saveVideos, incrementVideoView, 
+  getVideos, getUsers, saveUsers, saveVideos, incrementVideoView, updateVideo,
   ensureVideoInDB, getMessages, saveMessages, getNotifications, 
   saveNotifications, subscribeToVideo, deleteVideoFromDB, getAppSettings, subscribeToAppSettings,
   updateUser, createWatchParty, joinWatchParty, subscribeToWatchParty, updateWatchPartyState,
@@ -830,19 +830,18 @@ export const VideoItem: React.FC<{
     setLikesCount(prev => newStatus ? prev + 1 : prev - 1);
     
     await ensureVideoInDB(video);
-    const dbVideos = await getVideos();
-    const idx = dbVideos.findIndex(v => v.id === video.id);
-    if (idx !== -1) {
-      const currentLikes = dbVideos[idx].likes || [];
+    await updateVideo(video.id, (v) => {
+      const currentLikes = v.likes || [];
+      let updatedLikes = [...currentLikes];
       if (newStatus) {
-        if (!(currentLikes || []).includes(currentUser.id)) {
-          dbVideos[idx].likes = [...currentLikes, currentUser.id];
+        if (!updatedLikes.includes(currentUser.id)) {
+          updatedLikes.push(currentUser.id);
         }
       } else {
-        dbVideos[idx].likes = (currentLikes || []).filter(id => id !== currentUser.id);
+        updatedLikes = updatedLikes.filter(id => id !== currentUser.id);
       }
-      await saveVideos(dbVideos);
-    }
+      return { ...v, likes: updatedLikes };
+    });
   };
 
   const handleDoubleTap = (e: React.MouseEvent) => {
