@@ -1,362 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="Chrome Reworked, Experience the global internet using Chrome Reworked, the fastest Proxy in the world The best looking proxy there is with Apps and tab cloaking surf the web with blazing speeds with Chrome Reworked !" />
-  <title>Home | Chrome Reworked</title>
-  <link rel="icon" href="./app/icons/favicon.png">
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap");
-    
-    :root {
-      --primary-color: white;
-      --secondary-color: #c4c4c4;
-      --background-color: #0f0f0f;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CentralTok is Moving!</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-    * {
-      box-sizing: border-box;
-    }
+    <style>
+        :root {
+            --primary-glow: #6366f1;
+            --accent-glow: #ec4899;
+            --cyan-glow: #06b6d4;
+            --bg-color: #090a16;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
 
-    body {
-      background-color: var(--background-color);
-      font-family: "Inter", sans-serif;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
 
-    h1, h2, h3 {
-      color: var(--primary-color);
-      margin: 0;
-    }
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            color: #ffffff;
+            padding: 20px;
+        }
 
-    a {
-      color: var(--secondary-color);
-      text-decoration: none;
-    }
+        /* --- Animated Ambient Background Glows --- */
+        .ambient-sphere {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.6;
+            animation: float 10s ease-in-out infinite alternate;
+        }
 
-    ul.navbar {
-      list-style-type: none;
-      margin: 0;
-      z-index: 2;
-      padding: 0;
-      overflow: hidden;
-      background-color: #333;
-      position: absolute;
-      width: 100%;
-      top: 0px;
-      left: 0px;
-    }
+        .sphere-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary-glow);
+            top: -50px;
+            left: -50px;
+        }
 
-    li.nav-item {
-      float: left;
-      cursor: pointer !important;
-    }
+        .sphere-2 {
+            width: 450px;
+            height: 450px;
+            background: var(--accent-glow);
+            bottom: -50px;
+            right: -50px;
+            animation-duration: 13s;
+            animation-delay: -3s;
+        }
 
-    li.nav-item a {
-      display: block;
-      color: white;
-      transition: all 1s;
-      text-align: center;
-      padding: 14px 16px;
-      text-decoration: none;
-    }
+        .sphere-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--cyan-glow);
+            bottom: 30%;
+            left: 50%;
+            animation-duration: 16s;
+            animation-delay: -6s;
+        }
 
-    li.nav-item a:hover {
-      background-color: #444;
-    }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.1); }
+            100% { transform: translate(-30px, 70px) scale(0.95); }
+        }
 
-    #frame {
-      border: 0px solid black;
-      position: absolute;
-      width: 100%;
-      z-index: 1;
-      height: 100%;
-      bottom: 0px;
-      left: 0px;
-    }
+        /* --- Glass Container --- */
+        .card-wrapper {
+            position: relative;
+            z-index: 1;
+            perspective: 1000px;
+        }
 
-    #title {
-      width: 100%;
-      position: absolute;
-      bottom: 60%;
-      left: 0px;
-      text-align: center;
-      color: var(--primary-color);
-      text-shadow: 3px 6px 2px var(--secondary-color);
-    }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 48px 40px;
+            max-width: 580px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 1px rgba(255, 255, 255, 0.25);
+            transform-style: preserve-3d;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            animation: cardEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
-    #searchbar {
-      width: 70%;
-      position: absolute;
-      bottom: 45%;
-      left: 15%;
-      height: 50px;
-      padding: 10px;
-      border-radius: 25px;
-      background: transparent;
-      border: 3px solid var(--primary-color);
-      text-align: center;
-      color: var(--primary-color);
-      font-family: "Inter", sans-serif;
-      transition: all 1s;
-      z-index: 10;
-    }
+        @keyframes cardEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.92);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
 
-    #searchbar:hover {
-      transform: translateY(-5%);
-      background-color: #151414;
-    }
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 18px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fca5a5;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
 
-    #searchbar::placeholder {
-      color: var(--primary-color);
-    }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
 
-    #searchbar:focus {
-      outline: none;
-      background-color: rgba(21, 20, 20, 0.5);
-    }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
 
-    .particles {
-      display: flex;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 9999;
-      pointer-events: none;
-    }
+        /* Titles & Headings */
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, #ffffff 40%, rgba(255, 255, 255, 0.6));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    .particle {
-      flex: 1;
-      position: relative;
-      top: -10%;
-      animation: snowflakes-fall 15s linear, snowflakes-shake 5s ease-in-out;
-      animation-delay: var(--d);
-      animation-iteration-count: infinite;
-      width: 10%;
-      height: 10%;
-      color: white;
-      font-size: 2em;
-    }
+        .gradient-word {
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    @keyframes snowflakes-fall {
-      100% {
-        top: 100%;
-      }
-    }
+        p.description {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
 
-    @keyframes snowflakes-shake {
-      50% {
-        transform: translateX(100px) rotate(5deg);
-      }
-    }
+        /* Feature Pills */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 34px;
+        }
 
-    .searchform {
-      margin: 0;
-      padding: 0;
-    }
-  </style>
+        .feature-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-pill:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Button */
+        .cta-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px 32px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #6366f1, #d946ef);
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(217, 70, 239, 0.35);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: rotate(45deg) translateY(-100%);
+            transition: 0.6s ease;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 16px 35px rgba(99, 102, 241, 0.45);
+        }
+
+        .cta-btn:hover::before {
+            transform: rotate(45deg) translateY(100%);
+        }
+
+        .cta-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        @media (max-width: 480px) {
+            .glass-card {
+                padding: 36px 24px;
+            }
+            h1 {
+                font-size: 1.85rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<ul class="navbar">
-    <li class="nav-item"><a href="javascript:void(0)">Apps</a></li>
-    <li class="nav-item"><a href="javascript:void(0)">Tabs</a></li>
-    <li class="nav-item"><a href="javascript:void(0)">Settings</a></li>
-</ul>
-<form class="searchform" id="searchform" role="search">
-  <input id="searchbar" type="search" name="q" autocomplete="off" placeholder="Search the web freely" aria-label="Search">
-</form>
-<div id="title"><h1>Chrome Reworked</h1></div>
-<div class="particles" aria-hidden="true">
-  <div class="particle" style="--d: 0s, 0s;">.</div>
-  <div class="particle" style="--d: 1s, 1s;">.</div>
-  <div class="particle" style="--d: 6s, 0.5s;">.</div>
-  <div class="particle" style="--d: 4s, 2s;">.</div>
-  <div class="particle" style="--d: 2s, 2s;">.</div>
-  <div class="particle" style="--d: 8s, 3s;">.</div>
-  <div class="particle" style="--d: 6s, 2s;">.</div>
-  <div class="particle" style="--d: 2.5s, 1s;">.</div>
-  <div class="particle" style="--d: 1s, 0s;">.</div>
-  <div class="particle" style="--d: 3s, 1.5s;">.</div>
-</div>
-<iframe id="frame"></iframe>
 
-<script src="./app/uv/uv.bundle.js" defer></script>
-<script src="./app/uv/uv.config.js" defer></script>
+    <!-- Ambient Glow Orbs -->
+    <div class="ambient-sphere sphere-1"></div>
+    <div class="ambient-sphere sphere-2"></div>
+    <div class="ambient-sphere sphere-3"></div>
 
-<script>
-  // ===== Search Function (from search.js) =====
-  function search(input, template) {
-    try {
-      return new URL(input).toString();
-    } catch (err) {
-      // input was not a valid URL
-    }
+    <!-- Main Card -->
+    <div class="card-wrapper" id="cardWrapper">
+        <div class="glass-card" id="card">
+            
+            <div class="status-badge">
+                <span class="pulse-dot"></span> Notice: Discontinuation
+            </div>
 
-    try {
-      const url = new URL(`http://${input}`);
-      if (url.hostname.includes(".")) return url.toString();
-    } catch (err) {
-      // input was not valid URL
-    }
+            <h1>CentralTok is <span class="gradient-word">Moving</span></h1>
+            
+            <p class="description">
+                We are currently discontinuing <strong>CentralTok</strong>. You can continue using CentralTok on our brand-new site, featuring even more unblocked games, high-speed apps, and full <strong>Roblox</strong> support!
+            </p>
 
-    return template.replace("%s", encodeURIComponent(input));
-  }
+            <div class="features-grid">
+                <div class="feature-pill">
+                    <span>🎮</span> Roblox Ready
+                </div>
+                <div class="feature-pill">
+                    <span>⚡</span> CentralTok V2
+                </div>
+                <div class="feature-pill">
+                    <span>🚀</span> More Games & Apps
+                </div>
+            </div>
 
-  // ===== Service Worker Registration (from register-sw.js) =====
-  const stockSW = "./app/uv-sw.js";
-  const swAllowedHostnames = ["localhost", "127.0.0.1"];
+            <!-- Change the href attribute to your actual new site link -->
+            <a href="https://your-new-site-url.com" target="_blank" class="cta-btn">
+                Launch New Site
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
 
-  async function registerSW() {
-    if (
-      location.protocol !== "https:" &&
-      !swAllowedHostnames.includes(location.hostname)
-    ) {
-      console.warn("Service workers only work over https (except on localhost)");
-      return;
-    }
+        </div>
+    </div>
 
-    if (!navigator.serviceWorker) {
-      console.warn("Your browser doesn't support service workers.");
-      return;
-    }
+    <!-- Interactive 3D Tilt Script -->
+    <script>
+        const card = document.getElementById('card');
+        const wrapper = document.getElementById('cardWrapper');
 
-    try {
-      await navigator.serviceWorker.register(stockSW, {
-        scope: __uv$config ? __uv$config.prefix : '/service/',
-      });
-      console.log("Service worker registered successfully");
-    } catch (err) {
-      console.warn("Service worker registration failed:", err);
-    }
-  }
+        wrapper.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
 
-  // ===== Main UI Initialization =====
-  document.addEventListener('DOMContentLoaded', function() {
-    var searchbar = document.getElementById("searchbar");
-    var searchform = document.getElementById("searchform");
-    var titleEl = document.getElementById("title");
+            const rotateX = (-y / rect.height) * 16;
+            const rotateY = (x / rect.width) * 16;
 
-    // Responsive font sizing
-    var fontsize = (2560 / screen.width) * 17.5;
-    var fontsize2 = (2560 / screen.width) * 6.5;
-    if (titleEl) titleEl.style.fontSize = fontsize + "px";
-    if (searchbar) searchbar.style.fontSize = fontsize2 + "px";
-
-    // Search form submission
-    if (searchform) {
-      searchform.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const rawQuery = searchbar.value.trim();
-        if (!rawQuery) return;
-
-        try {
-          if (typeof registerSW === 'function') {
-            await registerSW();
-          }
-        } catch (err) {
-          console.error("Service worker registration error:", err.toString());
-        }
-
-        if (typeof search === 'function' && typeof __uv$config !== 'undefined') {
-          const url = search(rawQuery, "https://www.google.com/search?q=%s");
-          window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-        } else {
-          console.warn("Proxy functionality not available. Opening search in new tab.");
-          const query = encodeURIComponent(rawQuery);
-          window.open(`https://www.google.com/search?q=${query}`, '_blank');
-        }
-      });
-    }
-
-    // Frame management (for tab persistence)
-    var frame = document.getElementById("frame");
-    function get_cookie(cookie_name) {
-      const value = "; " + document.cookie;
-      const parts = value.split("; " + cookie_name + "=");
-      if (parts.length === 2) return parts.pop().split(";").shift();
-      return null;
-    }
-
-    if (frame) {
-      if (get_cookie("location") != null) {
-        frame.src = get_cookie("location");
-      }
-      var navbar = document.getElementsByClassName("navbar")[0];
-      if (navbar) {
-        frame.style.height = (window.innerHeight - navbar.offsetHeight + 5) + "px";
-        setInterval(function() {
-          try {
-            var locationHref = frame.contentWindow.location.href;
-            document.cookie = "location=" + locationHref.replace(window.location.origin, "") + "; expires=Thu, 18 Dec 9013 12:00:00 UTC; path=/";
-          } catch (e) {
-            // Cross-origin frame access error, ignore
-          }
-        }, 100);
-      }
-    }
-
-    // About:blank cloaking
-    function checkPopups() {
-      var newWin = window.open("", "", "width=100, height=100");
-      if (newWin) {
-        newWin.close();
-        return true;
-      } else {
-        alert("HELLO! For auto cloaking in about:blank please allow pop ups!");
-        return false;
-      }
-    }
-
-    window.addEventListener('load', function () {
-      var currentUrl = window.location.href;
-      if (currentUrl !== "about:blank" && !sessionStorage.getItem('tabOpened')) {
-        if (checkPopups()) {
-          sessionStorage.setItem('tabOpened', 'true');
-          try {
-            var win = window.open('about:blank', '_blank');
-            if (win) {
-              win.document.write("<html style='height:100%; margin:0; padding:0;'><body style='height:100%; margin:0; padding:0;'><iframe src='" + currentUrl + "' style='width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;'></iframe></body></html>");
-              win.onbeforeunload = function () {
-                sessionStorage.removeItem('tabOpened');
-              };
-              window.close();
-            }
-          } catch (e) {
-            console.warn("About:blank cloaking not available");
-          }
-        } else if (!sessionStorage.getItem('alertShown')) {
-          sessionStorage.setItem('alertShown', 'true');
-        }
-      }
-    });
-
-    // Clear cookies on # key press
-    window.addEventListener('keydown', (event) => {
-      if (event.key === '#') {
-        document.cookie.split(";").forEach(cookie => {
-          document.cookie = cookie.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
         });
-        alert('All saved cookie data cleared');
-        location.reload(true);
-      }
-    });
 
-    // Handle window resize for responsive layout
-    window.addEventListener('resize', function() {
-      if (titleEl) titleEl.style.fontSize = (2560 / screen.width) * 17.5 + "px";
-      if (searchbar) searchbar.style.fontSize = (2560 / screen.width) * 6.5 + "px";
-      if (frame && navbar) {
-        frame.style.height = (window.innerHeight - navbar.offsetHeight + 5) + "px";
-      }
-    });
-  });
-</script>
-
+        wrapper.addEventListener('mouseleave', () => {
+            card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        });
+    </script>
 </body>
 </html>
