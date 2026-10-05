@@ -1,0 +1,9 @@
+# GitHub Pages configuration for Aura OS
+enforceHTTPS: false
+include:
+  - ".nojekyll"
+  - "_headers"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
